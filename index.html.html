@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Cost Dashboard — Lighthouse Canton</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#eef1f7; --surface:#fff; --surface2:#f5f7fb; --border:#e1e8f0; --border2:#c5d1e5;
+  --blue:#2563eb; --blue-l:#eff4ff; --blue-m:#dbeafe;
+  --green:#059669; --green-l:#ecfdf5; --green-m:#d1fae5;
+  --amber:#d97706; --amber-l:#fffbeb; --amber-m:#fef3c7;
+  --purple:#7c3aed; --purple-l:#f5f3ff;
+  --teal:#0891b2; --teal-l:#ecfeff;
+  --red:#dc2626; --red-l:#fef2f2;
+  --slate:#475569; --slatel:#94a3b8;
+  --text:#0f172a; --text2:#334155;
+  --sh:0 1px 4px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 20px rgba(0,0,0,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding-bottom:80px;}
+
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 40px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh);position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:11px;}
+.lmark{width:32px;height:32px;background:linear-gradient(135deg,#1d4ed8,#0891b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:13px;color:#fff;}
+.ltxt{font-size:13px;font-weight:700;}
+.lsub2{font-size:10px;color:var(--slatel);font-family:'DM Mono',monospace;margin-top:1px;}
+.hbadges{display:flex;gap:6px;align-items:center;}
+.hb{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;}
+.hb1{background:var(--green-m);color:var(--green);border:1px solid #a7f3d0;}
+.hb2{background:var(--blue-m);color:var(--blue);border:1px solid #bfdbfe;}
+.hb3{background:var(--amber-m);color:var(--amber);border:1px solid #fcd34d;}
+.hbg{background:#f1f5f9;color:var(--slatel);border:1px solid var(--border2);font-size:9px;}
+
+.C{max-width:1280px;margin:0 auto;padding:0 40px;}
+.sec{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slatel);padding-top:24px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ══════════════════════════════
+   PROJECTED HERO — Green
+══════════════════════════════ */
+.proj-hero{background:linear-gradient(135deg,#064e3b 0%,#065f46 50%,#047857 100%);border-radius:16px;padding:28px 36px;box-shadow:0 6px 28px rgba(6,78,59,.28);}
+.proj-top{display:flex;align-items:center;gap:0;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.15);}
+.proj-main{flex:1;min-width:0;}
+.proj-main .plbl{font-size:10px;color:rgba(255,255,255,.6);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.proj-main .pval{font-family:'DM Serif Display',serif;font-size:52px;color:#fff;line-height:1;}
+.proj-main .psub{font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;font-family:'DM Mono',monospace;}
+.pdiv{width:1px;height:56px;background:rgba(255,255,255,.18);flex-shrink:0;margin:0 26px;}
+.pstat{flex-shrink:0;text-align:center;min-width:110px;}
+.pstat .pl{font-size:9px;color:rgba(255,255,255,.55);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;white-space:nowrap;}
+.pstat .pv{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;line-height:1;}
+.pstat .ps{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px;font-family:'DM Mono',monospace;white-space:nowrap;}
+
+.proj-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.pb-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 16px;}
+.pb-lbl{font-size:9px;color:rgba(255,255,255,.55);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.pb-val{font-size:20px;font-family:'DM Serif Display',serif;color:#fff;line-height:1;}
+.pb-note{font-size:10px;color:rgba(255,255,255,.45);margin-top:4px;font-family:'DM Mono',monospace;}
+.pb-bar{height:3px;background:rgba(255,255,255,.15);border-radius:3px;margin-top:10px;}
+.pb-bar-fill{height:3px;border-radius:3px;background:rgba(255,255,255,.6);}
+
+/* MODEL TABS */
+.model-tabs-wrap{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:16px 18px;margin-top:14px;}
+.model-tabs-title{font-size:10px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.model-tabs{display:flex;gap:8px;margin-bottom:14px;}
+.mtab{padding:8px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;}
+.mtab:hover{background:rgba(255,255,255,.1);color:#fff;}
+.mtab.active{color:#fff;border-color:rgba(255,255,255,.5);}
+.mtab.haiku.active{background:rgba(5,150,105,.5);}
+.mtab.sonnet.active{background:rgba(37,99,235,.5);}
+.mtab.opus.active{background:rgba(220,38,38,.4);}
+.model-detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.md-card{background:rgba(255,255,255,.06);border-radius:8px;padding:12px 14px;text-align:center;}
+.md-lbl{font-size:9px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.md-val{font-size:18px;font-family:'DM Serif Display',serif;color:#fff;}
+.md-sub{font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;margin-top:2px;}
+
+/* OPENAI */
+.oai-proj{background:linear-gradient(135deg,#78350f,#92400e);border-radius:12px;padding:20px 26px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 12px rgba(120,53,15,.22);margin-top:14px;}
+.oai-proj-left{display:flex;align-items:center;gap:14px;}
+.oai-proj-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;}
+.oai-proj-sub{font-size:10px;color:rgba(255,255,255,.55);font-family:'DM Mono',monospace;}
+.oai-proj-stats{display:flex;gap:28px;}
+.ops{text-align:center;}
+.ops-l{font-size:9px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:4px;}
+.ops-v{font-size:20px;font-family:'DM Serif Display',serif;color:#fff;}
+
+/* SLIDERS */
+.sliders-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 28px;box-shadow:var(--sh);}
+.sliders-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.sliders-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 44px;}
+.sg{display:flex;flex-direction:column;gap:8px;}
+.sg-header{display:flex;justify-content:space-between;align-items:baseline;}
+.sg-lbl{font-size:11px;font-weight:600;color:var(--text2);}
+.sg-val{font-size:17px;font-family:'DM Serif Display',serif;color:var(--green);}
+.sg-ends{display:flex;justify-content:space-between;font-size:9px;color:var(--slatel);margin-top:2px;}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;background:var(--border2);border-radius:6px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--green);border:3px solid #fff;box-shadow:0 2px 6px rgba(5,150,105,.35);cursor:grab;}
+input[type=range]:active::-webkit-slider-thumb{cursor:grabbing;}
+input[type=range]:hover::-webkit-slider-thumb{box-shadow:0 0 0 8px rgba(5,150,105,.12);}
+.sliders-note{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);display:flex;align-items:center;gap:8px;}
+
+/* ══════════════════════════════
+   LAST YEAR HERO — Blue
+══════════════════════════════ */
+.ly-hero{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 55%,#0369a1 100%);border-radius:16px;padding:24px 36px;box-shadow:0 4px 20px rgba(30,64,175,.22);}
+.ly-top{display:flex;align-items:center;gap:0;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.15);}
+.ly-main{flex:1;min-width:0;}
+.ly-main .llbl{font-size:10px;color:rgba(255,255,255,.6);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+.ly-main .lval{font-family:'DM Serif Display',serif;font-size:42px;color:#fff;line-height:1;}
+.ly-main .lsub3{font-size:11px;color:rgba(255,255,255,.5);margin-top:5px;font-family:'DM Mono',monospace;}
+.ldiv{width:1px;height:52px;background:rgba(255,255,255,.18);flex-shrink:0;margin:0 24px;}
+.lstat{flex-shrink:0;text-align:center;min-width:100px;}
+.lstat .ll{font-size:9px;color:rgba(255,255,255,.55);font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;white-space:nowrap;}
+.lstat .lv{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;line-height:1;}
+.lstat .ls{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px;font-family:'DM Mono',monospace;white-space:nowrap;}
+
+/* Monthly cards for last year */
+.ramp-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:7px;}
+.ramp-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 8px;text-align:center;}
+.ramp-mo{font-size:9px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.ramp-phase{font-size:8px;color:rgba(255,255,255,.35);font-family:'DM Mono',monospace;margin-bottom:5px;}
+.ramp-cost{font-size:13px;font-family:'DM Serif Display',serif;color:#fff;}
+.ramp-sub{font-size:9px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;margin-top:2px;}
+
+/* LAST YEAR DETAIL */
+.ly-detail{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.dcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;box-shadow:var(--sh);}
+.dcard-head{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:2px solid var(--border);margin-bottom:12px;}
+.dcard-title{font-size:14px;font-weight:700;}
+.dcard-period{font-size:10px;color:var(--slatel);font-family:'DM Mono',monospace;margin-top:2px;}
+.dcard-tot-lbl{font-size:9px;font-weight:700;color:var(--slatel);text-transform:uppercase;letter-spacing:.06em;text-align:right;}
+.dcard-tot-val{font-size:26px;font-family:'DM Serif Display',serif;text-align:right;}
+.li{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
+.li:last-child{border-bottom:none;}
+.li-lbl{display:flex;align-items:center;gap:7px;color:var(--text2);font-size:12.5px;flex:1;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.li-r{text-align:right;flex-shrink:0;}
+.li-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--text);}
+.li-note{font-size:10px;color:var(--slatel);margin-top:1px;}
+.li-sub{background:var(--surface2);border-radius:7px;padding:9px 11px;margin-top:5px;border:none;}
+
+/* CHART */
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 26px;box-shadow:var(--sh);}
+.chart-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.chart-ttl{font-size:13px;font-weight:700;}
+.chart-sub2{font-size:11px;color:var(--slatel);margin-top:2px;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.legsq{width:10px;height:10px;border-radius:3px;}
+
+/* APPENDIX */
+.app-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;padding:13px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;user-select:none;box-shadow:var(--sh);}
+.app-toggle:hover{background:var(--surface2);}
+.app-arr{margin-left:auto;font-size:12px;color:var(--slatel);transition:transform .2s;}
+.app-arr.open{transform:rotate(180deg);}
+.app-body{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:22px 26px;}
+.app-body.show{display:block;}
+.mc3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:4px;}
+.mc{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+.mc-name{font-size:18px;font-family:'DM Serif Display',serif;margin-bottom:3px;}
+.mc-desc{font-size:10px;color:var(--slatel);margin-bottom:12px;}
+.mcr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.mcr:last-of-type{border-bottom:none;}
+.mcrv{font-family:'DM Mono',monospace;font-weight:600;}
+.disc{font-size:10.5px;color:var(--slatel);line-height:1.65;padding:12px 16px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--border2);margin-top:14px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAqAC0DASIAAhEBAxEB/8QAGwAAAwEAAwEAAAAAAAAAAAAAAAgJBwIEBQb/xAAyEAABAwQBAgQCCQUAAAAAAAABAgMEAAUGEQcSIQgTGDFB0xQVMlVWkZKUoThRdoG0/8QAGQEAAgMBAAAAAAAAAAAAAAAAAAQBAwYC/8QAJBEAAgIBAwIHAAAAAAAAAAAAAQIAEQMEITEFQRITI2FxgbH/2gAMAwEAAhEDEQA/AEyph+P/AAkZ/l2G2vJ27zYbcxc46ZTDEhx0uBpY2hSulBA6kkK1s9iN6OwF4qr/AAtJah8CYXLfJDTGMQXFkDZCUxUE/wACiSASaEUX0TcgfirGP1P/AC6PRNyB+KsY/U/8unWw3LLLllndu1nfWuI08pla3EFGlJAJ9/hpQ718nc+bsAg3VUBU+S/0K6VvsMFTQPx772f9A1W2bGoBJ2MexdL1ubI2LHiYsvIo7fMTzNvCHn+MYnc8iXfcemtW6MuS6wy46HFIQNq6epABOgexIpc6rByjcYN24Qym422S3JiP2KUtt1B7KHkqqT9WA3uIkylSVYURCqo8bf0zY3/h0b/jTUrqrBwmw1K4HwmM+gLZexmC24kn7STGQCPyqCLFTrEwRwx7GZJxTeIjXBGSWWPcmG7y+/IVHjeYA6sFtvuke59lflXqcOXPi+PxYWL/APVSZgLn05ElsF5w7OunY2e2ta9q0mJxRx/Elty4uOtsvtKC0OIkvApI+P264z+JePZ1yVcJGOMectXUsIdcQhR/uUhQH8UgunyrXBoVNrqeu9M1Hmr6ih2D2PCDYFVzx+GdTOpVlmeH7In8eUybYbBKEcNDSUpDKu2vgRUqqrLy1FjQeFsqiQ2G48dqxykNttpCUpAZV2AFSap9RQ3mKzMrZGZbonvz9+8K3jj3xV8m4XiEDGIkew3KJb2gzGcnxnVOoaA0lG0OJBCR2GxvXbdYPRUyuMx61OVPuPD/ANnI+fR61OVPuPD/ANnI+fSz0UQm/Zx4s+T8sxS445IiY7b49wZUw+9DiOh3y1DSkgrcUBsbG9b79iD3rAaKKIT/2Q==" style="width:34px;height:34px;border-radius:8px;object-fit:contain;background:#fff;padding:2px;" alt="LC Logo">
+    <div>
+      <div class="ltxt">Lighthouse Canton — AI Cost Dashboard</div>
+      <div class="lsub2">Projected Jun 2026–May 2027 · Last Year Jun 2025–May 2026 · 18,688,250 token baseline</div>
+    </div>
+  </div>
+  <div class="hbadges">
+    <span class="hb hb1">↑ Projected Jun 2026–27</span>
+    <span class="hb hb2">↓ Last Year Jun 25–May 26</span>
+    <span class="hb hb3">OpenAI Separate</span>
+    <span class="hb hbg">18,688,250 tokens · 106,790 avg/user · updated baseline</span>
+  </div>
+</header>
+
+<div class="C">
+
+  <!-- ═══════════════════════════════════
+       PROJECTED — Jun 2026 – May 2027
+  ═══════════════════════════════════ -->
+  <div class="sec">Projected Annual Cost — June 2026 to May 2027</div>
+
+  <div class="proj-hero">
+    <!-- TOP: total + stats -->
+    <div class="proj-top">
+      <div class="proj-main">
+        <div class="plbl">Claude AI — Projected Annual Spend · Jun 2026 – May 2027</div>
+        <div class="pval" id="proj-total">—</div>
+        <div class="psub" id="proj-sub">175 users · $20/user/mo base + token consumption + additional usage</div>
+      </div>
+      <div class="pdiv"></div>
+      <div class="pstat">
+        <div class="pl">Monthly Run Rate</div>
+        <div class="pv" id="proj-mo">—</div>
+        <div class="ps">All Claude costs</div>
+      </div>
+      <div class="pdiv"></div>
+      <div class="pstat">
+        <div class="pl">Base Seats (Annual)</div>
+        <div class="pv" id="proj-seats">—</div>
+        <div class="ps" id="proj-seats-s">— users × $20 × 12</div>
+      </div>
+      <div class="pdiv"></div>
+      <div class="pstat">
+        <div class="pl">Token Cost (Annual)</div>
+        <div class="pv" id="proj-tok">—</div>
+        <div class="ps" id="proj-tok-s">—</div>
+      </div>
+      <div class="pdiv"></div>
+      <div class="pstat" style="cursor:default;" title="Total annual Claude spend ÷ number of users. Includes each user's share of: base seat ($20/mo), token consumption, additional usage allowance (shared), and Claude Code API (shared).">
+        <div class="pl">Cost / User / Year <span style="font-size:9px;opacity:.6;">ⓘ</span></div>
+        <div class="pv" id="proj-cpu">—</div>
+        <div class="ps" id="proj-cpu-s">annual ÷ users</div>
+      </div>
+    </div>
+
+    <!-- BREAKDOWN CARDS -->
+    <div class="proj-breakdown">
+      <div class="pb-card">
+        <div class="pb-lbl">Base Seat License</div>
+        <div class="pb-val" id="pb-seat">—</div>
+        <div class="pb-note" id="pb-seat-n">—</div>
+        <div class="pb-bar"><div class="pb-bar-fill" id="pb-seat-bar" style="width:60%"></div></div>
+      </div>
+      <div class="pb-card">
+        <div class="pb-lbl">Token Consumption</div>
+        <div class="pb-val" id="pb-tok">—</div>
+        <div class="pb-note" id="pb-tok-n">—</div>
+        <div class="pb-bar"><div class="pb-bar-fill" id="pb-tok-bar" style="width:5%"></div></div>
+      </div>
+      <div class="pb-card">
+        <div class="pb-lbl">Additional Usage</div>
+        <div class="pb-val" id="pb-add">—</div>
+        <div class="pb-note" id="pb-add-n">—</div>
+        <div class="pb-bar"><div class="pb-bar-fill" id="pb-add-bar" style="width:32%"></div></div>
+      </div>
+      <div class="pb-card">
+        <div class="pb-lbl">Claude Code API</div>
+        <div class="pb-val" id="pb-code">—</div>
+        <div class="pb-note" id="pb-code-n">—</div>
+        <div class="pb-bar"><div class="pb-bar-fill" id="pb-code-bar" style="width:2%"></div></div>
+      </div>
+    </div>
+
+    <!-- COST PER USER EXPLANATION -->
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 16px;margin-top:12px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:16px;flex-shrink:0">💡</span>
+      <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.6;">
+        <strong style="color:#fff">How Cost/User/Year is calculated:</strong>
+        Total annual Claude spend ÷ 175 users. Each user's share = 
+        Seat ($240/yr) + Tokens (<span id="cpu-tok-share">$3.89</span>/yr) + 
+        Additional Usage (<span id="cpu-add-share">$137/yr</span>) + 
+        Claude Code (<span id="cpu-code-share">$171/yr</span>). 
+        Note: Additional Usage and Claude Code are <em>org-level</em> costs shared equally across all users.
+      </div>
+    </div>
+
+    <!-- MODEL TABS -->
+    <div class="model-tabs-wrap">
+      <div class="model-tabs-title">Token cost by model — select to update projection</div>
+      <div class="model-tabs">
+        <button class="mtab haiku" onclick="setModel(0)" id="mtab0">Haiku 4.5</button>
+        <button class="mtab sonnet active" onclick="setModel(1)" id="mtab1">Sonnet 4.6 ✓ Default</button>
+        <button class="mtab opus" onclick="setModel(2)" id="mtab2">Opus 4.7</button>
+      </div>
+      <div class="model-detail-grid">
+        <div class="md-card">
+          <div class="md-lbl">Input Price</div>
+          <div class="md-val" id="md-inp">$3 / MTok</div>
+          <div class="md-sub">per million tokens</div>
+        </div>
+        <div class="md-card">
+          <div class="md-lbl">Output Price</div>
+          <div class="md-val" id="md-out">$15 / MTok</div>
+          <div class="md-sub">per million tokens</div>
+        </div>
+        <div class="md-card">
+          <div class="md-lbl">Token Cost / User / Mo</div>
+          <div class="md-val" id="md-pu">—</div>
+          <div class="md-sub">106,790 avg tokens/user</div>
+        </div>
+        <div class="md-card">
+          <div class="md-lbl">Token Cost / Mo (175 users)</div>
+          <div class="md-val" id="md-org">—</div>
+          <div class="md-sub">excl. $20 base seat</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPENAI -->
+  <div class="oai-proj">
+    <div class="oai-proj-left">
+      <span style="font-size:22px">🤖</span>
+      <div>
+        <div class="oai-proj-title">OpenAI Enterprise — Separate Budget Line · Jun 2026–May 2027</div>
+        <div class="oai-proj-sub">GPT-4o · o1 · o3 · o4-mini · DALL·E 3 · Whisper · SSO · Admin · No training data use</div>
+      </div>
+    </div>
+    <div class="oai-proj-stats">
+      <div class="ops"><div class="ops-l">Users</div><div class="ops-v" id="oai-users">—</div></div>
+      <div class="ops"><div class="ops-l">$/User/Mo</div><div class="ops-v" id="oai-pu">—</div></div>
+      <div class="ops"><div class="ops-l">Monthly</div><div class="ops-v" id="oai-mo">—</div></div>
+      <div class="ops"><div class="ops-l">Annual</div><div class="ops-v" id="oai-ann">—</div></div>
+    </div>
+  </div>
+
+  <!-- SLIDERS -->
+  <div class="sec">Scenario Controls — Projected Jun 2026–May 2027 Only</div>
+  <div class="sliders-panel">
+    <div class="sliders-title">🎛️ Adjust parameters — only the Projected section above updates</div>
+    <div class="sliders-grid">
+      <div class="sg">
+        <div class="sg-header"><span class="sg-lbl">Claude Users</span><span class="sg-val" id="sv-users">175</span></div>
+        <input type="range" id="sl-users" min="150" max="300" value="175" oninput="rc()">
+        <div class="sg-ends"><span>150</span><span>300</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-header"><span class="sg-lbl">Usage Growth Factor</span><span class="sg-val" id="sv-growth">1.0×</span></div>
+        <input type="range" id="sl-growth" min="0.5" max="5.0" step="0.5" value="1.0" oninput="rc()">
+        <div class="sg-ends"><span>0.5×</span><span>5.0×</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-header"><span class="sg-lbl">Additional Usage $/mo</span><span class="sg-val" id="sv-add">$2,000</span></div>
+        <input type="range" id="sl-add" min="0" max="10000" step="250" value="2000" oninput="rc()">
+        <div class="sg-ends"><span>$0</span><span>$10,000</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-header"><span class="sg-lbl">Claude Code API $/mo</span><span class="sg-val" id="sv-code">$500</span></div>
+        <input type="range" id="sl-code" min="0" max="2000" step="100" value="500" oninput="rc()">
+        <div class="sg-ends"><span>$0</span><span>$2,000</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-header"><span class="sg-lbl">OpenAI Users</span><span class="sg-val" id="sv-oai-u">50</span></div>
+        <input type="range" id="sl-oai-u" min="10" max="150" value="50" oninput="rc()">
+        <div class="sg-ends"><span>10</span><span>150</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-header"><span class="sg-lbl">OpenAI $/user/mo</span><span class="sg-val" id="sv-oai-p">$409</span></div>
+        <input type="range" id="sl-oai-p" min="30" max="600" step="1" value="409" oninput="rc()">
+        <div class="sg-ends"><span>$30</span><span>$600</span></div>
+      </div>
+    </div>
+    <div class="sliders-note">
+      <span style="font-size:15px">📊</span>
+      <span><strong>Token baseline:</strong> 18,688,250 total tokens ÷ 175 users = 106,790 avg/user/mo · 75% input / 25% output · Sonnet 4.6: $0.64/user/mo · $20/user/mo base seat always fixed · Claude Code API $500/mo</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       LAST YEAR — Jun 2025 – May 2026
+  ═══════════════════════════════════ -->
+  <div class="sec" style="padding-top:32px">Last Year Actuals — June 2025 to May 2026</div>
+
+  <div class="ly-hero">
+    <div class="ly-top">
+      <div class="ly-main">
+        <div class="llbl">Claude AI — Full Year Actuals · Jun 2025 – May 2026 · excl. OpenAI</div>
+        <div class="lval" id="ly-total">—</div>
+        <div class="lsub3">Fixed licensing · 160 std @$40 + 15 prem @$150 · users onboarded progressively Jun 2025–May 2026</div>
+      </div>
+      <div class="ldiv"></div>
+      <div class="lstat">
+        <div class="ll">Licenses (Annual)</div>
+        <div class="lv" id="ly-jun">—</div>
+        <div class="ls">pro-rated ramp</div>
+      </div>
+      <div class="ldiv"></div>
+      <div class="lstat">
+        <div class="ll">Additional Usage + Code</div>
+        <div class="lv" id="ly-usage">—</div>
+        <div class="ls">$1,000+$500/mo × 12</div>
+      </div>
+      <div class="ldiv"></div>
+      <div class="lstat">
+        <div class="ll">Avg Monthly</div>
+        <div class="lv" id="ly-mo">—</div>
+        <div class="ls">Jun 25–May 26</div>
+      </div>
+      <div class="ldiv"></div>
+      <div class="lstat">
+        <div class="ll">Cost / User / Year</div>
+        <div class="lv" id="ly-cpu">—</div>
+        <div class="ls">175 users</div>
+      </div>
+    </div>
+
+    <!-- 12 monthly cards -->
+    <div class="ramp-grid" id="ly-months"></div>
+  </div>
+
+  <!-- CHART -->
+  <div class="sec">Monthly Cost View — Last Year vs Projected</div>
+  <div class="chart-box">
+    <div class="chart-hd">
+      <div>
+        <div class="chart-ttl">Monthly AI Spend · Jun 2025–May 2026 Actuals vs Jun 2026–May 2027 Projected</div>
+        <div class="chart-sub2">Claude only · OpenAI excluded · Model tabs above change token component in projected bars</div>
+      </div>
+      <div class="legend">
+        <div class="leg"><div class="legsq" style="background:rgba(37,99,235,.72)"></div>Seats/Licenses</div>
+        <div class="leg"><div class="legsq" style="background:rgba(5,150,105,.65)"></div>Tokens</div>
+        <div class="leg"><div class="legsq" style="background:rgba(245,158,11,.65)"></div>Add. Usage</div>
+        <div class="leg"><div class="legsq" style="background:rgba(6,182,212,.55)"></div>Code API</div>
+        <div class="leg"><div class="legsq" style="background:#0f172a;border-radius:50%"></div>Total</div>
+      </div>
+    </div>
+    <canvas id="myChart" height="72"></canvas>
+  </div>
+
+  <!-- APPENDIX -->
+  <div class="sec">Appendix</div>
+  <div class="app-toggle" onclick="toggleApp()">
+    <span style="font-size:14px">📎</span>
+    <span style="font-size:12px;font-weight:600;color:var(--text2)">Technical Details — Model pricing, token calculation methodology</span>
+    <span class="app-arr" id="app-arr">▼</span>
+  </div>
+  <div class="app-body" id="app-body">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">Anthropic API Token Pricing (Apr 2026 · from Anthropic.com)</div>
+    <div class="mc3">
+      <div class="mc">
+        <div class="mc-name" style="color:var(--red)">Opus 4.7</div>
+        <div class="mc-desc">Most intelligent · at 106,790 tokens/user: $1.07/user/mo</div>
+        <div class="mcr"><span style="color:var(--text2)">Input</span><span class="mcrv">$5 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Output</span><span class="mcrv">$25 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Cache Write</span><span class="mcrv">$6.25 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Cache Read</span><span class="mcrv">$0.50 / MTok</span></div>
+      </div>
+      <div class="mc" style="border-color:#bfdbfe;background:var(--blue-l)">
+        <div class="mc-name" style="color:var(--blue)">Sonnet 4.6 ✓ Default</div>
+        <div class="mc-desc">Optimal balance · <strong>$0.64/user/mo at 106,790 tokens/user</strong></div>
+        <div class="mcr"><span style="color:var(--text2)">Input</span><span class="mcrv">$3 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Output</span><span class="mcrv">$15 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Cache Write</span><span class="mcrv">$3.75 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Cache Read</span><span class="mcrv">$0.30 / MTok</span></div>
+      </div>
+      <div class="mc">
+        <div class="mc-name" style="color:var(--green)">Haiku 4.5</div>
+        <div class="mc-desc">Fastest · at 106,790 tokens/user: $0.21/user/mo</div>
+        <div class="mcr"><span style="color:var(--text2)">Input</span><span class="mcrv">$1 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Output</span><span class="mcrv">$5 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Cache Write</span><span class="mcrv">$1.25 / MTok</span></div>
+        <div class="mcr"><span style="color:var(--text2)">Cache Read</span><span class="mcrv">$0.10 / MTok</span></div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-top:14px;font-size:11px;color:var(--text2);line-height:1.7;">
+      <strong>Token calculation:</strong> Total tokens: 18,688,250 ÷ 175 users = 106,790 avg tokens/user/month. At Sonnet 4.6 (75% input / 25% output): (106,790 × 0.75 × $3 + 106,790 × 0.25 × $15) / 1,000,000 = <strong>$0.6407/user/month</strong>. At 175 users = $112.13/month. Claude Code API: $500/month. Growth factor slider scales token volume.
+    </div>
+    <div class="disc">⚠️ <strong>Compliance Note:</strong> For internal planning only. OpenAI at $409/user/month is the starting reference — formal quote required. Review by Finance and Compliance required before board or regulatory submission.</div>
+  </div>
+  <div style="height:28px"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ── TOKEN DATA FROM APR 2026 REPORT ──────────────────
+const AVG_TOK = 106790;  // 18,688,250 total tokens ÷ 175 users
+const INP_R   = 0.75;
+const OUT_R   = 0.25;
+
+const MODELS = [
+  { name:'Haiku 4.5',        inp:1,  out:5,  inp_lbl:'$1 / MTok',  out_lbl:'$5 / MTok'  },
+  { name:'Sonnet 4.6',       inp:3,  out:15, inp_lbl:'$3 / MTok',  out_lbl:'$15 / MTok' },
+  { name:'Opus 4.7',         inp:5,  out:25, inp_lbl:'$5 / MTok',  out_lbl:'$25 / MTok' },
+];
+let MODEL_IDX = 1;  // Sonnet default
+
+// Last year fixed constants
+const LY_JUN_SEATS = 160*40 + 15*150;  // $8,650
+const BASE_SEAT    = 20;
+
+// Month labels
+const LY_MOS  = ['Jun\'25','Jul','Aug','Sep','Oct','Nov','Dec','Jan\'26','Feb','Mar','Apr','May\'26'];
+const PRJ_MOS = ['Jun\'26','Jul','Aug','Sep','Oct','Nov','Dec','Jan\'27','Feb','Mar','Apr','May\'27'];
+
+function fm(n){
+  if(n>=1e6) return '$'+(n/1e6).toFixed(2)+'M';
+  if(n>=1e3) return '$'+Math.round(n).toLocaleString();
+  return '$'+Math.round(n);
+}
+function fd(n){ return '$'+n.toFixed(2); }
+
+function tokCostPerUser(mi){ return (AVG_TOK*INP_R/1e6)*MODELS[mi].inp + (AVG_TOK*OUT_R/1e6)*MODELS[mi].out; }
+
+function setModel(i){
+  MODEL_IDX = i;
+  [0,1,2].forEach(j=>{
+    const t = document.getElementById('mtab'+j);
+    t.classList.remove('active');
+  });
+  document.getElementById('mtab'+i).classList.add('active');
+  rc();
+}
+
+let chart = null;
+
+function rc(){
+  const users  = +document.getElementById('sl-users').value;
+  const growth = +document.getElementById('sl-growth').value;
+  const add    = +document.getElementById('sl-add').value;
+  const code   = +document.getElementById('sl-code').value;
+  const oaiU   = +document.getElementById('sl-oai-u').value;
+  const oaiP   = +document.getElementById('sl-oai-p').value;
+  const mi     = MODEL_IDX;
+
+  document.getElementById('sv-users').textContent  = users;
+  document.getElementById('sv-growth').textContent = growth.toFixed(1)+'×';
+  document.getElementById('sv-add').textContent    = '$'+add.toLocaleString();
+  document.getElementById('sv-code').textContent   = '$'+code.toLocaleString();
+  document.getElementById('sv-oai-u').textContent  = oaiU;
+  document.getElementById('sv-oai-p').textContent  = '$'+oaiP;
+
+  // Per-user token cost
+  const pu_tok   = tokCostPerUser(mi) * growth;
+  const seatMo   = users * BASE_SEAT;
+  const tokMo    = pu_tok * users;
+  const projMo   = seatMo + tokMo + add + code;
+  const projAnn  = projMo * 12;
+
+  const seatPct  = Math.round((seatMo/projMo)*100);
+  const tokPct   = Math.max(1, Math.round((tokMo/projMo)*100));
+  const addPct   = Math.round((add/projMo)*100);
+  const codePct  = Math.max(1, 100-seatPct-tokPct-addPct);
+
+  // OpenAI
+  const oaiMo    = oaiU * oaiP;
+  const oaiAnn   = oaiMo * 12;
+
+  // ── PROJECTED HERO ──────────────────────────────
+  document.getElementById('proj-total').textContent   = fm(projAnn);
+  document.getElementById('proj-sub').textContent     = `${users} users · $20/user/mo base + ${MODELS[mi].name} tokens ($${pu_tok.toFixed(2)}/user/mo) + add. usage`;
+  document.getElementById('proj-mo').textContent      = fm(projMo)+'/mo';
+  document.getElementById('proj-seats').textContent   = fm(seatMo*12);
+  document.getElementById('proj-seats-s').textContent = `${users} users × $20 × 12`;
+  document.getElementById('proj-tok').textContent     = fm(tokMo*12);
+  document.getElementById('proj-tok-s').textContent   = `$${pu_tok.toFixed(2)}/user/mo × ${users} × 12`;
+  document.getElementById('proj-cpu').textContent     = fm(projAnn/users)+'/yr';
+  if(document.getElementById('proj-cpu-s')) document.getElementById('proj-cpu-s').textContent = fm(projAnn)+' ÷ '+users+' users';
+  // Cost per user breakdown shares
+  if(document.getElementById('cpu-tok-share'))  document.getElementById('cpu-tok-share').textContent  = '$'+(pu_tok*12).toFixed(2);
+  if(document.getElementById('cpu-add-share'))  document.getElementById('cpu-add-share').textContent  = '$'+(add*12/users).toFixed(0);
+  if(document.getElementById('cpu-code-share')) document.getElementById('cpu-code-share').textContent = '$'+(code*12/users).toFixed(0);
+  // Breakdown cards
+  document.getElementById('pb-seat').textContent     = fm(seatMo*12);
+  document.getElementById('pb-seat-n').textContent   = `${users} users × $20 × 12 mo`;
+  document.getElementById('pb-seat-bar').style.width = seatPct+'%';
+  document.getElementById('pb-tok').textContent      = fm(tokMo*12);
+  document.getElementById('pb-tok-n').textContent    = `$${pu_tok.toFixed(2)}/user/mo × ${users} × 12`;
+  document.getElementById('pb-tok-bar').style.width  = tokPct+'%';
+  document.getElementById('pb-add').textContent      = fm(add*12);
+  document.getElementById('pb-add-n').textContent    = `$${add.toLocaleString()}/mo × 12`;
+  document.getElementById('pb-add-bar').style.width  = addPct+'%';
+  document.getElementById('pb-code').textContent     = fm(code*12);
+  document.getElementById('pb-code-n').textContent   = `$${code}/mo × 12`;
+  document.getElementById('pb-code-bar').style.width = codePct+'%';
+
+  // ── MODEL DETAIL ─────────────────────────────────
+  document.getElementById('md-inp').textContent = MODELS[mi].inp_lbl;
+  document.getElementById('md-out').textContent = MODELS[mi].out_lbl;
+  document.getElementById('md-pu').textContent  = fd(pu_tok)+'/user/mo';
+  document.getElementById('md-org').textContent = fd(tokMo)+'/mo';
+
+  // ── OPENAI ────────────────────────────────────────
+  document.getElementById('oai-users').textContent = oaiU;
+  document.getElementById('oai-pu').textContent    = '$'+oaiP;
+  document.getElementById('oai-mo').textContent    = fm(oaiMo);
+  document.getElementById('oai-ann').textContent   = fm(oaiAnn);
+
+  // ── LAST YEAR (fixed licensing only, progressive ramp) ──
+  // Users joined progressively Jun 2025–May 2026
+  // Last year: 160 std @ $40 + 15 prem @ $150, ramped progressively
+  const LY_USER_RAMP  = [40,55,68,78,85,92,98,111,130,146,161,175];
+  const LY_STD_RATIO  = 160/175;
+  const LY_PREM_RATIO = 15/175;
+  const LY_STD_RATE   = 40;
+  const LY_PREM_RATE  = 150;
+  const LY_ADD        = 1000;
+  const LY_CODE       = 500;
+
+  // Per month: split users into std/prem, calc license cost
+  const lyLicCosts = LY_USER_RAMP.map(u => {
+    const std_u  = Math.round(u * LY_STD_RATIO);
+    const prem_u = u - std_u;
+    return std_u * LY_STD_RATE + prem_u * LY_PREM_RATE;
+  });
+  const lyMoCosts    = lyLicCosts.map(lic => lic + LY_ADD + LY_CODE);
+  const ly_total     = lyMoCosts.reduce((a,b)=>a+b,0);
+  const ly_lic_total = lyLicCosts.reduce((a,b)=>a+b,0);
+  const ly_avg_users = LY_USER_RAMP.reduce((a,b)=>a+b,0)/12;
+  const ly_avg_mo    = ly_total/12;
+
+  document.getElementById('ly-total').textContent  = fm(ly_total);
+  document.getElementById('ly-jun').textContent    = fm(lyMoCosts[0]);
+  document.getElementById('ly-usage').textContent  = fm(ly_total - lyMoCosts[0]);
+  document.getElementById('ly-mo').textContent     = fm(ly_avg_mo)+'/mo avg';
+  document.getElementById('ly-cpu').textContent    = fm(ly_total/175)+'/yr';
+  // Detail card left (licenses)
+  // Detail card right (totals)
+
+  // ── MONTHLY CARDS (last year) ─────────────────────
+  const lyLabels = ["Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25",
+                    "Dec '25","Jan '26","Feb '26","Mar '26","Apr '26","May '26"];
+  const maxCost = Math.max(...lyMoCosts);
+  document.getElementById('ly-months').innerHTML = lyMoCosts.map((tot,i)=>{
+    const u      = LY_USER_RAMP[i];
+    const std_u  = Math.round(u * LY_STD_RATIO);
+    const prem_u = u - std_u;
+    const pct    = Math.round((tot/maxCost)*100);
+    return `<div class="ramp-card">
+      <div class="ramp-mo">${lyLabels[i]}</div>
+      <div class="ramp-phase" style="color:rgba(147,197,253,.7)">${std_u} std · ${prem_u} prem</div>
+      <div class="ramp-cost">${fm(tot)}</div>
+      <div class="ramp-sub">${fm(lyLicCosts[i])} lic</div>
+      <div class="ramp-bar"><div class="ramp-bar-fill" style="width:${pct}%;background:rgba(147,197,253,.6)"></div></div>
+    </div>`;
+  }).join('');
+
+  // ── CHART ─────────────────────────────────────────
+  const lyData = lyLicCosts.map(lic=>({ seats:lic, tok:0, add:LY_ADD, code:LY_CODE }));
+  const prData = Array(12).fill(null).map(()=>({ seats:seatMo, tok:tokMo, add:add, code:code }));
+
+  const allLabels = [...LY_MOS, null, ...PRJ_MOS];
+
+  const mkSeats = (d,i) => i<12 ? d[i].seats : (i===12 ? null : prData[i-13].seats);
+  const mkTok   = (d,i) => i<12 ? d[i].tok   : (i===12 ? null : prData[i-13].tok);
+  const mkAdd   = (d,i) => i<12 ? d[i].add   : (i===12 ? null : prData[i-13].add);
+  const mkCode  = (d,i) => i<12 ? d[i].code  : (i===12 ? null : prData[i-13].code);
+  const mkTotal = (i)   => {
+    if(i<12){ const d=lyData[i]; return d.seats+d.tok+d.add+d.code; }
+    if(i===12) return null;
+    return projMo;
+  };
+
+  const n = allLabels.length;
+  const ctx = document.getElementById('myChart').getContext('2d');
+  if(chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:allLabels,
+      datasets:[
+        { label:'Seats/Licenses', data:Array.from({length:n},(_,i)=>mkSeats(lyData,i)), backgroundColor:(c)=>{ const i=c.dataIndex; return i===12?null:(i<12?'rgba(37,99,235,.72)':'rgba(37,99,235,.45)'); }, borderRadius:3, borderSkipped:false, stack:'s' },
+        { label:'Token Usage',    data:Array.from({length:n},(_,i)=>mkTok(lyData,i)),   backgroundColor:(c)=>{ const i=c.dataIndex; return i===12?null:(i<12?'rgba(5,150,105,.65)':'rgba(5,150,105,.55)'); }, borderRadius:3, borderSkipped:false, stack:'s' },
+        { label:'Add. Usage',     data:Array.from({length:n},(_,i)=>mkAdd(lyData,i)),   backgroundColor:(c)=>{ const i=c.dataIndex; return i===12?null:(i<12?'rgba(245,158,11,.65)':'rgba(245,158,11,.55)'); }, borderRadius:3, borderSkipped:false, stack:'s' },
+        { label:'Claude Code',    data:Array.from({length:n},(_,i)=>mkCode(lyData,i)),  backgroundColor:(c)=>{ const i=c.dataIndex; return i===12?null:(i<12?'rgba(6,182,212,.55)':'rgba(6,182,212,.45)'); }, borderRadius:3, borderSkipped:false, stack:'s' },
+        { label:'Total', data:Array.from({length:n},(_,i)=>mkTotal(i)), type:'line', borderColor:'rgba(15,23,42,.5)', backgroundColor:'transparent', borderWidth:2.5, pointBackgroundColor:'#fff', pointBorderColor:'#0f172a', pointBorderWidth:2, pointRadius:(c)=>c.dataIndex===12?0:3.5, tension:0.35, order:0, yAxisID:'y', spanGaps:false }
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          callbacks:{
+            label:c=>c.raw!=null?` ${c.dataset.label}: $${Math.round(c.raw).toLocaleString()}`:'',
+            title:items=>{ const i=items[0].dataIndex; return i===12?'(gap)':allLabels[i]||''; }
+          },
+          filter:item=>item.raw!=null,
+          backgroundColor:'#fff', borderColor:'#e1e8f0', borderWidth:1,
+          titleColor:'#0f172a', bodyColor:'#475569', padding:12,
+          titleFont:{family:'Inter',size:13,weight:'700'}, bodyFont:{family:'DM Mono',size:11}
+        }
+      },
+      scales:{
+        x:{ stacked:true, grid:{color:'rgba(203,213,225,.4)'}, ticks:{color:'#94a3b8',font:{family:'Inter',size:10},maxRotation:0} },
+        y:{ stacked:true, grid:{color:'rgba(203,213,225,.4)'}, ticks:{color:'#94a3b8',font:{family:'DM Mono',size:11},callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)} }
+      }
+    }
+  });
+}
+
+function toggleApp(){
+  document.getElementById('app-body').classList.toggle('show');
+  document.getElementById('app-arr').classList.toggle('open');
+}
+
+rc();
+</script>
+</body>
+</html>
